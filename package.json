@@ -1,0 +1,16 @@
+{
+  "name": "construction-ai-agent",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:api": "pnpm --filter @construction/api dev",
+    "dev:web": "pnpm --filter @construction/web dev",
+    "build": "pnpm --parallel -r build",
+    "db:migrate": "pnpm --filter @construction/api db:migrate",
+    "test:agent": "pnpm --filter @construction/api test:agent"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
