@@ -6,12 +6,12 @@ import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
-// Tất cả chat routes cần auth
+// All chat routes require authentication
 router.use(authenticate);
 
 /**
  * GET /api/conversations
- * Danh sách conversations, mới nhất trước.
+ * List conversations, newest first.
  */
 router.get('/conversations', async (req, res) => {
   try {
@@ -27,7 +27,7 @@ router.get('/conversations', async (req, res) => {
 
 /**
  * GET /api/conversations/:id/messages
- * Lấy messages của 1 conversation.
+ * Get messages for a conversation.
  */
 router.get('/conversations/:id/messages', async (req, res) => {
   try {
@@ -62,7 +62,7 @@ router.post('/chat', async (req, res) => {
   });
 
   try {
-    // 1. Tạo hoặc lấy conversation
+    // 1. Create or get conversation
     let convId = conversationId;
     if (!convId) {
       const title = message.slice(0, 60) + (message.length > 60 ? '...' : '');
@@ -71,47 +71,47 @@ router.post('/chat', async (req, res) => {
         [uuidv4(), title]
       );
       convId = rows[0].id;
-      // Gửi conversationId cho client
+      // Send conversationId to client
       res.write(`data: ${JSON.stringify({ type: 'conversation', conversationId: convId })}\n\n`);
     }
 
-    // 2. Lưu user message
+    // 2. Save user message
     await pool.query(
       'INSERT INTO messages (id, conversation_id, role, content) VALUES ($1, $2, $3, $4)',
       [uuidv4(), convId, 'user', message]
     );
 
-    // 3. Lấy chat history
+    // 3. Get chat history
     const { rows: history } = await pool.query(
       'SELECT role, content FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC',
       [convId]
     );
-    // Bỏ message cuối (vừa insert) vì sẽ truyền qua userMessage
+    // Remove last message (just inserted) since it will be sent via userMessage
     const previousMessages = history.slice(0, -1);
 
-    // 4. Chạy agent với streaming
+    // 4. Run agent with streaming
     const result = await runAgentStream(message, previousMessages, (chunk) => {
       res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
     });
 
-    // 5. Gửi function calls info (nếu có)
+    // 5. Send function calls info (if any)
     if (result.functionCalls.length > 0) {
       res.write(`data: ${JSON.stringify({ type: 'functionCalls', calls: result.functionCalls })}\n\n`);
     }
 
-    // 6. Lưu assistant message
+    // 6. Save assistant message
     await pool.query(
       'INSERT INTO messages (id, conversation_id, role, content, function_calls) VALUES ($1, $2, $3, $4, $5)',
       [uuidv4(), convId, 'model', result.text, JSON.stringify(result.functionCalls)]
     );
 
-    // 7. Cập nhật conversation timestamp
+    // 7. Update conversation timestamp
     await pool.query(
       'UPDATE conversations SET updated_at = NOW() WHERE id = $1',
       [convId]
     );
 
-    // 8. Gửi done event
+    // 8. Send done event
     res.write(`data: ${JSON.stringify({ type: 'done', text: result.text })}\n\n`);
     res.end();
   } catch (err) {
@@ -123,7 +123,7 @@ router.post('/chat', async (req, res) => {
 
 /**
  * DELETE /api/conversations/:id
- * Xóa conversation + cascade messages.
+ * Delete conversation + cascade messages.
  */
 router.delete('/conversations/:id', async (req, res) => {
   try {

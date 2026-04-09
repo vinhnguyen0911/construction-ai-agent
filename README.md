@@ -1,20 +1,20 @@
-# 🏗️ Construction AI Agent
+# Construction AI Agent
 
-> Trợ lý AI thông minh cho công ty xây dựng — phân tích thời tiết và đưa ra khuyến nghị thi công tự động.
+> Smart AI assistant for construction companies — analyzes weather data and provides automated construction recommendations.
 
-## Tổng quan
+## Overview
 
-Ứng dụng web chat AI tích hợp **Google Gemini** với khả năng **function calling** tự động. Agent phân tích dữ liệu thời tiết từ OpenWeatherMap và đưa ra khuyến nghị thi công phù hợp cho các công trình xây dựng tại Việt Nam.
+A web-based AI chat application powered by **Google Gemini** with automatic **function calling**. The agent analyzes weather data from OpenWeatherMap and provides construction recommendations for building sites in Vietnam.
 
-### Tính năng chính
+### Key Features
 
-- 💬 **Chat AI** — Hỏi đáp tự nhiên bằng tiếng Việt, agent tự gọi API thời tiết khi cần
-- 🔧 **Function Calling** — Gemini tự quyết định gọi tool nào dựa trên câu hỏi
-- 📊 **Kết quả trực quan** — Bảng markdown + insight khuyến nghị thi công
-- 📅 **Báo cáo tự động** — Chạy hàng ngày lúc 7h sáng cho 3 khu vực (TPHCM, Đồng Nai, Bình Dương)
-- 🔄 **Streaming response** — Hiển thị realtime khi AI đang trả lời
+- **AI Chat** — Natural language Q&A in Vietnamese, agent automatically calls weather APIs when needed
+- **Function Calling** — Gemini decides which tool to call based on the user's question
+- **Visual Results** — Markdown tables + construction insights
+- **Automated Reports** — Daily reports at 7:00 AM for 3 regions (HCMC, Dong Nai, Binh Duong)
+- **Streaming Response** — Real-time display while AI is generating
 
-## Kiến trúc
+## Architecture
 
 ```
 ┌──────────┐     ┌───────────────┐     ┌──────────────┐     ┌────────────┐
@@ -28,33 +28,33 @@
                             (Function Calling)      (Weather Data)
 ```
 
-> Chi tiết kiến trúc: xem [docs/architecture.md](docs/architecture.md)
+> Detailed architecture: see [docs/architecture.md](docs/architecture.md)
 
 ## Technical Decisions
 
-| Công nghệ | Lý do chọn |
+| Technology | Rationale |
 |---|---|
-| **Google Gemini** (`gemini-2.0-flash`) | Free tier 1M tokens/ngày, hỗ trợ function calling, không cần thẻ tín dụng |
-| **Neon PostgreSQL** | Serverless Postgres miễn phí, auto-sleep khi không dùng, setup nhanh |
-| **Railway** | Hỗ trợ cron jobs, deploy dễ dàng từ Git, có free tier |
-| **Vercel** | Deploy frontend tối ưu cho React/Vite, free tier |
-| **pnpm Workspaces** | Monorepo management hiệu quả, tiết kiệm disk với symlinks |
-| **JavaScript thuần** | Nhanh setup, không overhead TypeScript cho dự án nhỏ |
+| **Google Gemini** (`gemini-2.0-flash`) | Free tier 1M tokens/day, function calling support, no credit card required |
+| **Neon PostgreSQL** | Free serverless Postgres, auto-sleep when idle, quick setup |
+| **Railway** | Cron job support, easy Git-based deploys, free tier available |
+| **Vercel** | Optimized frontend deployment for React/Vite, free tier |
+| **pnpm Workspaces** | Efficient monorepo management, disk savings via symlinks |
+| **Plain JavaScript** | Fast setup, no TypeScript overhead for a small project |
 
-## Cài đặt Local
+## Local Setup
 
-### Yêu cầu
+### Prerequisites
 
 - Node.js >= 18
 - pnpm >= 8 (`npm install -g pnpm`)
 
-### Bước 1: Lấy API Keys
+### Step 1: Get API Keys
 
-1. **Gemini API Key**: Truy cập https://aistudio.google.com/apikey → Create API Key
-2. **OpenWeatherMap API Key**: Đăng ký tại https://openweathermap.org/api → Lấy key từ trang API Keys (free tier)
-3. **Neon Database**: Đăng ký tại https://console.neon.tech → Tạo project → Copy connection string
+1. **Gemini API Key**: Go to https://aistudio.google.com/apikey → Create API Key
+2. **OpenWeatherMap API Key**: Sign up at https://openweathermap.org/api → Get key from API Keys page (free tier)
+3. **Neon Database**: Sign up at https://console.neon.tech → Create project → Copy connection string
 
-### Bước 2: Clone và cài đặt
+### Step 2: Clone and install
 
 ```bash
 git clone <repo-url>
@@ -62,27 +62,27 @@ cd construction-ai-agent
 pnpm install
 ```
 
-### Bước 3: Cấu hình biến môi trường
+### Step 3: Configure environment variables
 
 ```bash
 cp .env.example .env
-# Điền các API keys vào file .env
+# Fill in API keys in .env file
 ```
 
-### Bước 4: Chạy migration tạo database tables
+### Step 4: Run database migration
 
 ```bash
 pnpm db:migrate
 ```
 
-### Bước 5: Test agent (tùy chọn)
+### Step 5: Test agent (optional)
 
 ```bash
 pnpm test:agent
-# Chạy script standalone test Gemini function calling
+# Runs standalone script to test Gemini function calling
 ```
 
-### Bước 6: Chạy ứng dụng
+### Step 6: Run the application
 
 ```bash
 pnpm dev
@@ -90,43 +90,43 @@ pnpm dev
 # Backend:  http://localhost:3001
 ```
 
-### Đăng nhập
+### Login Credentials
 
 - Username: `admin`
 - Password: `admin`
 
 ## Agent Functions
 
-| Function | Mô tả | API Source |
+| Function | Description | API Source |
 |---|---|---|
-| `get_current_weather` | Lấy thời tiết hiện tại (nhiệt độ, độ ẩm, gió, mô tả) | OpenWeatherMap Current |
-| `get_weather_forecast` | Lấy dự báo thời tiết 1-5 ngày (aggregate theo ngày) | OpenWeatherMap Forecast |
+| `get_current_weather` | Get current weather (temperature, humidity, wind, description) | OpenWeatherMap Current |
+| `get_weather_forecast` | Get 1-5 day forecast (aggregated by day) | OpenWeatherMap Forecast |
 
-### Mở rộng thêm Function mới
+### Adding New Functions
 
-Để thêm 1 tool mới cho agent (ví dụ: `get_material_price`, `get_exchange_rate`):
+To add a new tool for the agent (e.g. `get_material_price`, `get_exchange_rate`):
 
-1. Tạo file mới trong `apps/api/src/tools/` (ví dụ: `material.js`)
-2. Export `declaration` (Gemini function schema) và `execute` function
-3. Import và register vào `apps/api/src/tools/index.js`
-4. Cập nhật system instruction trong `apps/api/src/agent/prompt.js` nếu cần
+1. Create a new file in `apps/api/src/tools/` (e.g. `material.js`)
+2. Export `declaration` (Gemini function schema) and `execute` function
+3. Import and register in `apps/api/src/tools/index.js`
+4. Update system instruction in `apps/api/src/agent/prompt.js` if needed
 
 ```javascript
 // apps/api/src/tools/material.js
 export const declaration = {
   name: 'get_material_price',
-  description: 'Lấy giá vật liệu xây dựng hiện tại',
+  description: 'Get current construction material prices',
   parameters: {
     type: 'object',
     properties: {
-      material: { type: 'string', description: 'Tên vật liệu (xi măng, thép, cát...)' },
+      material: { type: 'string', description: 'Material name (cement, steel, sand...)' },
     },
     required: ['material'],
   },
 };
 
 export async function execute({ material }) {
-  // Gọi API hoặc tra cứu database
+  // Call API or query database
   // return { material, price, unit, updated_at }
 }
 ```
@@ -135,45 +135,45 @@ export async function execute({ material }) {
 
 ### Frontend → Vercel
 
-1. Import repo trên Vercel
+1. Import repo on Vercel
 2. Root Directory: `apps/web`
 3. Build Command: `pnpm build`
 4. Output Directory: `dist`
-5. Environment: thêm `VITE_API_URL` = URL backend Railway
+5. Environment: add `VITE_API_URL` = Railway backend URL
 
 ### Backend → Railway
 
-1. Import repo trên Railway
+1. Import repo on Railway
 2. Root Directory: `apps/api`
 3. Start Command: `node src/index.js`
-4. Environment: thêm tất cả biến từ `.env.example`
+4. Environment: add all variables from `.env.example`
 
 ### Database → Neon
 
-1. Tạo project trên Neon Dashboard
-2. Copy connection string vào `DATABASE_URL`
-3. Chạy migration: `pnpm db:migrate`
+1. Create project on Neon Dashboard
+2. Copy connection string to `DATABASE_URL`
+3. Run migration: `pnpm db:migrate`
 
-### Lưu ý Railway Free Tier
+### Railway Free Tier Note
 
-Railway free tier container có thể sleep sau thời gian không hoạt động, khiến cron job có thể bị miss. Giải pháp:
-- Upgrade lên Developer plan ($5/tháng)
-- Hoặc dùng GitHub Actions cron gọi endpoint `POST /api/reports/run` để trigger thủ công
+Railway free tier containers may sleep after inactivity, which can cause cron jobs to be missed. Solutions:
+- Upgrade to Developer plan ($5/month)
+- Use GitHub Actions cron to call `POST /api/reports/run` endpoint as a manual trigger
 
-## Câu hỏi mẫu để test
+## Sample Questions
 
-- "Thời tiết hôm nay ở Hồ Chí Minh thế nào?"
-- "Dự báo thời tiết 3 ngày tới tại Biên Hòa"
-- "Hôm nay có nên đổ bê tông ở Thủ Dầu Một không?"
-- "So sánh thời tiết tuần này giữa TPHCM và Đồng Nai"
+- "Thoi tiet hom nay o Ho Chi Minh the nao?"
+- "Du bao thoi tiet 3 ngay toi tai Bien Hoa"
+- "Hom nay co nen do be tong o Thu Dau Mot khong?"
+- "So sanh thoi tiet tuan nay giua TPHCM va Dong Nai"
 
 ## Screenshots
 
-<!-- TODO: Thêm screenshots sau khi hoàn thiện UI -->
+<!-- TODO: Add screenshots after UI is finalized -->
 
 ## Tech Stack
 
-- **Frontend**: React 18, Vite, TailwindCSS, shadcn/ui, react-markdown
+- **Frontend**: React 18, Vite, TailwindCSS, Lucide Icons, react-markdown
 - **Backend**: Node.js, Express, pg, node-cron
 - **AI**: Google Gemini 2.0 Flash (function calling)
 - **Database**: PostgreSQL (Neon)

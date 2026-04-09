@@ -10,7 +10,7 @@ router.use(authenticate);
 /**
  * GET /api/reports
  * Query params: ?date=2024-01-15&location=Ho Chi Minh City
- * Trả về danh sách reports, mới nhất trước.
+ * Returns list of reports, newest first.
  */
 router.get('/', async (req, res) => {
   try {
@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
 
 /**
  * POST /api/reports/run
- * Trigger thủ công tạo báo cáo cho tất cả locations.
+ * Manually trigger report generation for all locations.
  * Body (optional): { locations: ["Ho Chi Minh City"] }
  */
 router.post('/run', async (req, res) => {

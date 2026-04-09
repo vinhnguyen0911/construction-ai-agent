@@ -1,4 +1,4 @@
-// Tool registry — khai báo declarations + map executors
+// Tool registry — declarations + executor map
 
 import {
   getCurrentWeatherDeclaration,
@@ -8,14 +8,13 @@ import {
 } from './weather.js';
 
 // ─── Gemini Function Declarations ─────────────────────────────────────
-// Mảng này được truyền vào Gemini model config
+// This array is passed to Gemini model config
 export const declarations = [
   getCurrentWeatherDeclaration,
   getWeatherForecastDeclaration,
 ];
 
 // ─── Executor Map ─────────────────────────────────────────────────────
-// Map function name → executor function
 const executors = {
   get_current_weather: getCurrentWeather,
   get_weather_forecast: getWeatherForecast,
@@ -23,9 +22,9 @@ const executors = {
 
 /**
  * Execute a tool by name with given args.
- * @param {string} name - Function name từ Gemini response
- * @param {object} args - Arguments cho function
- * @returns {Promise<object>} - Kết quả thực thi
+ * @param {string} name - Function name from Gemini response
+ * @param {object} args - Arguments for the function
+ * @returns {Promise<object>} - Execution result
  */
 export async function executeTool(name, args) {
   const executor = executors[name];

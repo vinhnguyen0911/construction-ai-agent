@@ -10,7 +10,7 @@ function authHeaders() {
 }
 
 /**
- * Fetch wrapper với auth header.
+ * Fetch wrapper with auth header.
  */
 export async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
@@ -81,7 +81,7 @@ export async function deleteConversation(id) {
 
 /**
  * POST /api/chat — SSE streaming.
- * Trả về ReadableStream, gọi onEvent cho mỗi SSE event.
+ * Returns ReadableStream, calls onEvent for each SSE event.
  */
 export async function sendMessage(message, conversationId, onEvent) {
   const res = await fetch(`${API_URL}/api/chat`, {

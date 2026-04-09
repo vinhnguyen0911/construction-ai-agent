@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token');
     if (!token) return null;
     try {
-      // Decode JWT payload (không verify — chỉ để hiển thị)
+      // Decode JWT payload (no verification — display only)
       const payload = JSON.parse(atob(token.split('.')[1]));
       return { username: payload.username };
     } catch {

@@ -3,8 +3,8 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me-to-a-random-string';
 
 /**
- * Middleware xác thực JWT.
- * Kiểm tra header: Authorization: Bearer <token>
+ * JWT authentication middleware.
+ * Check header: Authorization: Bearer <token>
  */
 export function authenticate(req, res, next) {
   const header = req.headers.authorization;
@@ -23,7 +23,7 @@ export function authenticate(req, res, next) {
 }
 
 /**
- * Tạo JWT token cho user.
+ * Create JWT token for a user.
  */
 export function signToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });

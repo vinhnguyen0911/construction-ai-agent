@@ -17,7 +17,7 @@ export default function ChatSidebar({
           className="flex items-center gap-2 w-full px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Cuoc tro chuyen moi
+          New Conversation
         </button>
       </div>
 
@@ -50,7 +50,7 @@ export default function ChatSidebar({
 
         {conversations.length === 0 && (
           <p className="text-xs text-gray-400 text-center py-8">
-            Chua co cuoc tro chuyen nao
+            No conversations yet
           </p>
         )}
       </div>

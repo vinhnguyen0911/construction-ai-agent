@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-// Test script — chạy agent standalone để verify Gemini + function calling
-// Usage: pnpm test:agent (hoặc node src/test-agent.js từ apps/api)
+// Test script — run agent standalone to verify Gemini + function calling
+// Usage: pnpm test:agent (or node src/test-agent.js from apps/api)
 
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -22,7 +22,6 @@ async function main() {
   console.log('🧪 TEST AGENT — Construction AI Agent');
   console.log('='.repeat(60));
 
-  // Validate env
   if (!process.env.GEMINI_API_KEY) {
     console.error('❌ Missing GEMINI_API_KEY in .env');
     process.exit(1);

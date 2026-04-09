@@ -7,13 +7,13 @@ const OPENWEATHER_BASE = 'https://api.openweathermap.org/data/2.5';
 export const getCurrentWeatherDeclaration = {
   name: 'get_current_weather',
   description:
-    'Lấy thông tin thời tiết hiện tại tại một thành phố. Trả về nhiệt độ, độ ẩm, tốc độ gió, mô tả thời tiết.',
+    'Get current weather information for a city. Returns temperature, humidity, wind speed, weather description.',
   parameters: {
     type: 'object',
     properties: {
       city: {
         type: 'string',
-        description: 'Tên thành phố (ví dụ: "Ho Chi Minh City", "Bien Hoa", "Thu Dau Mot")',
+        description: 'City name (e.g. "Ho Chi Minh City", "Bien Hoa", "Thu Dau Mot")',
       },
     },
     required: ['city'],
@@ -23,17 +23,17 @@ export const getCurrentWeatherDeclaration = {
 export const getWeatherForecastDeclaration = {
   name: 'get_weather_forecast',
   description:
-    'Lấy dự báo thời tiết từ 1 đến 5 ngày tới tại một thành phố. Trả về dự báo aggregate theo từng ngày.',
+    'Get weather forecast for 1 to 5 days ahead for a city. Returns aggregated daily forecast.',
   parameters: {
     type: 'object',
     properties: {
       city: {
         type: 'string',
-        description: 'Tên thành phố',
+        description: 'City name',
       },
       days: {
         type: 'number',
-        description: 'Số ngày dự báo (1-5, mặc định 3)',
+        description: 'Number of forecast days (1-5, default 3)',
       },
     },
     required: ['city'],
@@ -88,7 +88,7 @@ export async function getWeatherForecast({ city, days = 3 }) {
   const dailyMap = new Map();
 
   for (const item of data.list) {
-    const date = item.dt_txt.split(' ')[0]; // "2024-01-15"
+    const date = item.dt_txt.split(' ')[0];
 
     if (!dailyMap.has(date)) {
       dailyMap.set(date, {
@@ -127,7 +127,7 @@ export async function getWeatherForecast({ city, days = 3 }) {
   };
 }
 
-// Helper: tìm phần tử xuất hiện nhiều nhất
+// Helper: find most frequently occurring element
 function mostFrequent(arr) {
   const counts = {};
   for (const item of arr) {

@@ -17,7 +17,7 @@ const migration = `
 -- Conversations table
 CREATE TABLE IF NOT EXISTS conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL DEFAULT 'Cuộc trò chuyện mới',
+  title TEXT NOT NULL DEFAULT 'New Conversation',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

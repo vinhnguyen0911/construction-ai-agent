@@ -42,9 +42,9 @@ export default function Reports() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Bao cao thoi tiet</h1>
+            <h1 className="text-xl font-bold text-gray-900">Weather Reports</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Bao cao tu dong hang ngay cho cac khu vuc thi cong
+              Automatic daily reports for all construction sites
             </p>
           </div>
           <button
@@ -57,7 +57,7 @@ export default function Reports() {
             ) : (
               <RefreshCw className="w-4 h-4" />
             )}
-            {generating ? 'Dang tao...' : 'Tao bao cao'}
+            {generating ? 'Generating...' : 'Generate Report'}
           </button>
         </div>
 
@@ -68,8 +68,8 @@ export default function Reports() {
           </div>
         ) : reports.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            <p className="text-lg">Chua co bao cao nao</p>
-            <p className="text-sm mt-1">Nhan "Tao bao cao" de tao bao cao moi</p>
+            <p className="text-lg">No reports yet</p>
+            <p className="text-sm mt-1">Click "Generate Report" to create a new report</p>
           </div>
         ) : (
           <div className="space-y-4">

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const navItems = [
   { to: '/chat', label: 'Chat AI', icon: MessageSquare },
-  { to: '/reports', label: 'Bao cao', icon: FileText },
+  { to: '/reports', label: 'Reports', icon: FileText },
 ];
 
 export default function Layout({ children }) {
@@ -55,7 +55,7 @@ export default function Layout({ children }) {
             <button
               onClick={handleLogout}
               className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 transition-colors"
-              title="Dang xuat"
+              title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
             </button>

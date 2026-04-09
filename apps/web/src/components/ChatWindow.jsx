@@ -60,7 +60,7 @@ export default function ChatWindow({
             setStreamingText('');
             onMessageSent({
               role: 'model',
-              content: `Loi: ${event.error}`,
+              content: `Error: ${event.error}`,
             });
             break;
         }
@@ -69,7 +69,7 @@ export default function ChatWindow({
       setStreamingText('');
       onMessageSent({
         role: 'model',
-        content: `Loi ket noi: ${err.message}`,
+        content: `Connection error: ${err.message}`,
       });
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ export default function ChatWindow({
         {messages.length === 0 && !streamingText && (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <p className="text-lg font-medium">Construction AI Agent</p>
-            <p className="text-sm mt-1">Hoi bat ky cau hoi nao ve thoi tiet va thi cong</p>
+            <p className="text-sm mt-1">Ask any question about weather and construction</p>
           </div>
         )}
 
@@ -103,7 +103,7 @@ export default function ChatWindow({
               <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
             </div>
             <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-2.5">
-              <span className="text-sm text-gray-400">Dang suy nghi...</span>
+              <span className="text-sm text-gray-400">Thinking...</span>
             </div>
           </div>
         )}
@@ -119,7 +119,7 @@ export default function ChatWindow({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Nhap cau hoi ve thoi tiet, thi cong..."
+            placeholder="Ask about weather, construction..."
             disabled={loading}
             className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50"
           />

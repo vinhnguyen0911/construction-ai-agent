@@ -1,11 +1,13 @@
 // Agent loop — Gemini + function calling
-// Xử lý vòng lặp: gửi message → nhận response → nếu có functionCall → execute → gửi lại
+// Handle loop: send message → receive response → if functionCall → execute → resend
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SYSTEM_INSTRUCTION } from "./prompt.js";
 import { declarations, executeTool } from "../tools/index.js";
 
-const MAX_FUNCTION_CALLS = 5; // Giới hạn vòng lặp function calling
+const MAX_FUNCTION_CALLS = 5; // Limit function calling loop iterations
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 2000;
 
 let genAI = null;
 
@@ -17,18 +19,38 @@ function getGenAI() {
 }
 
 /**
- * Tạo Gemini model instance với function calling config.
+ * Retry wrapper — automatically retry on 503/429 errors.
+ */
+async function withRetry(fn) {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const status = err.message?.match(/\[(\d{3})/)?.[1];
+      if ((status === '503' || status === '429') && attempt < MAX_RETRIES) {
+        const delay = RETRY_DELAY_MS * attempt;
+        console.log(`⏳ Retry ${attempt}/${MAX_RETRIES} after ${delay}ms (${status})...`);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
+/**
+ * Create Gemini model instance with function calling config.
  */
 function createModel() {
   return getGenAI().getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.0-flash",
     systemInstruction: SYSTEM_INSTRUCTION,
     tools: [{ functionDeclarations: declarations }],
   });
 }
 
 /**
- * Chuyển đổi chat history từ DB format sang Gemini format.
+ * Convert chat history from DB format to Gemini format.
  * DB: { role: 'user'|'model', content: string }
  * Gemini: { role: 'user'|'model', parts: [{ text: string }] }
  */
@@ -42,9 +64,9 @@ export function toGeminiHistory(messages) {
 }
 
 /**
- * Chạy agent loop: gửi message + xử lý function calling lặp lại.
+ * Run agent loop: send message + handle repeated function calling.
  *
- * @param {string} userMessage - Câu hỏi của người dùng
+ * @param {string} userMessage - User question
  * @param {Array} history - Chat history (DB format)
  * @returns {Promise<{ text: string, functionCalls: Array }>}
  */
@@ -54,24 +76,21 @@ export async function runAgent(userMessage, history = []) {
 
   const chat = model.startChat({ history: geminiHistory });
 
-  let response = await chat.sendMessage(userMessage);
+  let response = await withRetry(() => chat.sendMessage(userMessage));
   let result = response.response;
   const allFunctionCalls = [];
 
-  // Agent loop — lặp khi Gemini yêu cầu function call
+  // Agent loop — loop when Gemini requests function call
   for (let i = 0; i < MAX_FUNCTION_CALLS; i++) {
     const candidate = result.candidates?.[0];
     const parts = candidate?.content?.parts || [];
 
-    // Tìm function calls trong response
     const functionCallParts = parts.filter((p) => p.functionCall);
 
     if (functionCallParts.length === 0) {
-      // Không có function call → trả về text response
       break;
     }
 
-    // Execute từng function call
     const functionResponses = [];
 
     for (const part of functionCallParts) {
@@ -97,12 +116,10 @@ export async function runAgent(userMessage, history = []) {
       }
     }
 
-    // Gửi function responses về Gemini để nhận text response
-    response = await chat.sendMessage(functionResponses);
+    response = await withRetry(() => chat.sendMessage(functionResponses));
     result = response.response;
   }
 
-  // Lấy text từ response cuối cùng
   const text =
     result.candidates?.[0]?.content?.parts
       ?.filter((p) => p.text)
@@ -116,12 +133,12 @@ export async function runAgent(userMessage, history = []) {
 }
 
 /**
- * Chạy agent với streaming response.
- * Dùng cho SSE endpoint — gọi callback mỗi khi có chunk.
+ * Run agent with streaming response.
+ * Used for SSE endpoint — call callback on each chunk.
  *
  * @param {string} userMessage
  * @param {Array} history
- * @param {function} onChunk - callback(text) cho mỗi chunk
+ * @param {function} onChunk - callback(text) for each chunk
  * @returns {Promise<{ text: string, functionCalls: Array }>}
  */
 export async function runAgentStream(userMessage, history = [], onChunk) {
@@ -130,12 +147,12 @@ export async function runAgentStream(userMessage, history = [], onChunk) {
 
   const chat = model.startChat({ history: geminiHistory });
 
-  // Bước 1: gửi message không stream để check function calls
-  let response = await chat.sendMessage(userMessage);
+  // Step 1: send non-streaming message to check function calls
+  let response = await withRetry(() => chat.sendMessage(userMessage));
   let result = response.response;
   const allFunctionCalls = [];
 
-  // Agent loop — xử lý function calls
+  // Agent loop — handle function calls
   for (let i = 0; i < MAX_FUNCTION_CALLS; i++) {
     const candidate = result.candidates?.[0];
     const parts = candidate?.content?.parts || [];
@@ -167,22 +184,21 @@ export async function runAgentStream(userMessage, history = [], onChunk) {
       }
     }
 
-    // Gửi function responses về Gemini
-    response = await chat.sendMessage(functionResponses);
+    // Send function responses to Gemini
+    response = await withRetry(() => chat.sendMessage(functionResponses));
     result = response.response;
 
-    // Nếu response vẫn có function call, tiếp tục loop
+    // If response still has function call, continue loop
     const nextParts = result.candidates?.[0]?.content?.parts || [];
     if (nextParts.some((p) => p.functionCall)) continue;
 
-    // Không còn function call → stream text response
     const text = nextParts
       .filter((p) => p.text)
       .map((p) => p.text)
       .join("");
 
     if (onChunk && text) {
-      // Simulate streaming bằng cách chia nhỏ text
+      // Simulate streaming by splitting text into chunks
       const chunkSize = 20;
       for (let j = 0; j < text.length; j += chunkSize) {
         onChunk(text.slice(j, j + chunkSize));
@@ -192,7 +208,7 @@ export async function runAgentStream(userMessage, history = [], onChunk) {
     return { text, functionCalls: allFunctionCalls };
   }
 
-  // Fallback: lấy text từ response cuối (trường hợp không có function call)
+  // Fallback: get text from final response (no function call case)
   const text =
     result.candidates?.[0]?.content?.parts
       ?.filter((p) => p.text)

@@ -35,7 +35,7 @@ export default function Login() {
             <HardHat className="w-7 h-7 text-primary-600" />
           </div>
           <h1 className="text-xl font-bold text-gray-900">Construction AI Agent</h1>
-          <p className="text-sm text-gray-500 mt-1">Dang nhap de tiep tuc</p>
+          <p className="text-sm text-gray-500 mt-1">Sign in to continue</p>
         </div>
 
         {/* Form */}
@@ -80,7 +80,7 @@ export default function Login() {
             className="w-full py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            Dang nhap
+            Sign In
           </button>
         </form>
       </div>

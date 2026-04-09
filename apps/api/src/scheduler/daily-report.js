@@ -5,8 +5,8 @@ import { runAgent } from '../agent/index.js';
 import { REPORT_LOCATIONS, REPORT_CRON_SCHEDULE, REPORT_TIMEZONE } from '@construction/shared';
 
 /**
- * Tạo báo cáo thời tiết hàng ngày cho các locations.
- * @param {string[]} [locations] - Override danh sách locations
+ * Generate daily weather reports for all locations.
+ * @param {string[]} [locations] - Override list of locations
  * @returns {Promise<Array<{ location, success, error? }>>}
  */
 export async function generateDailyReport(locations) {
@@ -39,7 +39,7 @@ Lấy thời tiết hiện tại và dự báo 3 ngày tới, sau đó đưa ra 
 }
 
 /**
- * Khởi động cron job tạo báo cáo hàng ngày.
+ * Start cron job for daily report generation.
  * Schedule: 7:00 AM Asia/Ho_Chi_Minh
  */
 export function startDailyReportCron() {
