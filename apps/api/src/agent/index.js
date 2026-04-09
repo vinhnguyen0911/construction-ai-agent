@@ -27,9 +27,11 @@ async function withRetry(fn) {
       return await fn();
     } catch (err) {
       const status = err.message?.match(/\[(\d{3})/)?.[1];
-      if ((status === '503' || status === '429') && attempt < MAX_RETRIES) {
+      if ((status === "503" || status === "429") && attempt < MAX_RETRIES) {
         const delay = RETRY_DELAY_MS * attempt;
-        console.log(`⏳ Retry ${attempt}/${MAX_RETRIES} after ${delay}ms (${status})...`);
+        console.log(
+          `⏳ Retry ${attempt}/${MAX_RETRIES} after ${delay}ms (${status})...`,
+        );
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }
@@ -43,7 +45,7 @@ async function withRetry(fn) {
  */
 function createModel() {
   return getGenAI().getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     systemInstruction: SYSTEM_INSTRUCTION,
     tools: [{ functionDeclarations: declarations }],
   });
