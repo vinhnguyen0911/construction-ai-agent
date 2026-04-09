@@ -10,6 +10,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@construction/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@google/generative-ai':
         specifier: ^0.21.0
         version: 0.21.0
