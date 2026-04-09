@@ -1,9 +1,9 @@
 // Agent loop — Gemini + function calling
 // Xử lý vòng lặp: gửi message → nhận response → nếu có functionCall → execute → gửi lại
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { SYSTEM_INSTRUCTION } from './prompt.js';
-import { declarations, executeTool } from '../tools/index.js';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { SYSTEM_INSTRUCTION } from "./prompt.js";
+import { declarations, executeTool } from "../tools/index.js";
 
 const MAX_FUNCTION_CALLS = 5; // Giới hạn vòng lặp function calling
 
@@ -21,7 +21,7 @@ function getGenAI() {
  */
 function createModel() {
   return getGenAI().getGenerativeModel({
-    model: 'gemini-2.0-flash',
+    model: "gemini-2.5-flash",
     systemInstruction: SYSTEM_INSTRUCTION,
     tools: [{ functionDeclarations: declarations }],
   });
@@ -34,10 +34,10 @@ function createModel() {
  */
 export function toGeminiHistory(messages) {
   return messages
-    .filter((m) => m.role === 'user' || m.role === 'model')
+    .filter((m) => m.role === "user" || m.role === "model")
     .map((m) => ({
       role: m.role,
-      parts: [{ text: m.content || '' }],
+      parts: [{ text: m.content || "" }],
     }));
 }
 
@@ -103,10 +103,11 @@ export async function runAgent(userMessage, history = []) {
   }
 
   // Lấy text từ response cuối cùng
-  const text = result.candidates?.[0]?.content?.parts
-    ?.filter((p) => p.text)
-    ?.map((p) => p.text)
-    ?.join('') || '';
+  const text =
+    result.candidates?.[0]?.content?.parts
+      ?.filter((p) => p.text)
+      ?.map((p) => p.text)
+      ?.join("") || "";
 
   return {
     text,
@@ -178,7 +179,7 @@ export async function runAgentStream(userMessage, history = [], onChunk) {
     const text = nextParts
       .filter((p) => p.text)
       .map((p) => p.text)
-      .join('');
+      .join("");
 
     if (onChunk && text) {
       // Simulate streaming bằng cách chia nhỏ text
@@ -192,10 +193,11 @@ export async function runAgentStream(userMessage, history = [], onChunk) {
   }
 
   // Fallback: lấy text từ response cuối (trường hợp không có function call)
-  const text = result.candidates?.[0]?.content?.parts
-    ?.filter((p) => p.text)
-    ?.map((p) => p.text)
-    ?.join('') || '';
+  const text =
+    result.candidates?.[0]?.content?.parts
+      ?.filter((p) => p.text)
+      ?.map((p) => p.text)
+      ?.join("") || "";
 
   if (onChunk && text) {
     const chunkSize = 20;

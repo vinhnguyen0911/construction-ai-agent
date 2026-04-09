@@ -5,3 +5,30 @@
 body {
   font-family: 'Inter', system-ui, sans-serif;
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Prose overrides for markdown tables */
+.prose table {
+  @apply text-sm border-collapse w-full;
+}
+.prose th,
+.prose td {
+  @apply border border-gray-200 px-3 py-1.5 text-left;
+}
+.prose th {
+  @apply bg-gray-50 font-medium;
+}
