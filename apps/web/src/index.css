@@ -2,11 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', system-ui, sans-serif;
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    @apply bg-civil-bg text-civil-text transition-colors duration-200;
+  }
+
+  .dark body,
+  html.dark body {
+    @apply bg-civil-bg-dark text-civil-text-dark;
+  }
 }
 
-/* Scrollbar styling */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -20,15 +29,62 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
-
-/* Prose overrides for markdown tables */
-.prose table {
-  @apply text-sm border-collapse w-full;
+.dark ::-webkit-scrollbar-thumb {
+  background: #374151;
 }
-.prose th,
-.prose td {
-  @apply border border-gray-200 px-3 py-1.5 text-left;
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Prose overrides for markdown */
+.prose table {
+  @apply text-sm border-collapse w-full overflow-hidden rounded-lg;
+}
+.prose thead tr {
+  @apply bg-accent-light dark:bg-accent-dark-light;
 }
 .prose th {
-  @apply bg-gray-50 font-medium;
+  @apply border border-civil-border dark:border-civil-border-dark px-3 py-2 text-left font-semibold text-sm;
+}
+.prose td {
+  @apply border border-civil-border dark:border-civil-border-dark px-3 py-2 text-left text-sm;
+}
+.prose tbody tr:nth-child(even) {
+  @apply bg-civil-secondary/50 dark:bg-civil-secondary-dark/50;
+}
+.prose ul {
+  @apply list-disc;
+}
+.prose ul > li::marker {
+  @apply text-accent dark:text-accent-dark;
+}
+.prose strong {
+  @apply font-semibold;
+}
+.prose code {
+  @apply bg-civil-secondary dark:bg-civil-secondary-dark rounded-md px-1.5 py-0.5 text-sm font-mono;
+}
+.prose pre {
+  @apply bg-civil-secondary dark:bg-civil-secondary-dark rounded-lg p-4;
+}
+
+/* Animations */
+.animate-message {
+  animation: slideUp 200ms ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode smooth transition */
+html {
+  transition: background-color 200ms ease, color 200ms ease;
 }

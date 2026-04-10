@@ -1,39 +1,32 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Bot, User } from 'lucide-react';
-import { cn } from '../lib/cn';
+import { Bot } from 'lucide-react';
 
 export default function MessageBubble({ role, content }) {
   const isUser = role === 'user';
 
+  if (isUser) {
+    return (
+      <div className="flex justify-end py-2 animate-message">
+        <div className="max-w-[75%] bg-civil-chat-user dark:bg-civil-chat-user-dark rounded-2xl rounded-br-sm px-4 py-3 text-sm leading-relaxed text-civil-text dark:text-civil-text-dark">
+          <p className="whitespace-pre-wrap">{content}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={cn('flex gap-3 py-3', isUser && 'flex-row-reverse')}>
+    <div className="flex gap-3 py-2 animate-message">
       {/* Avatar */}
-      <div
-        className={cn(
-          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-          isUser ? 'bg-primary-100 text-primary-600' : 'bg-amber-100 text-amber-600'
-        )}
-      >
-        {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+      <div className="w-7 h-7 rounded-full bg-accent dark:bg-accent-dark flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Bot className="w-3.5 h-3.5 text-white" />
       </div>
 
-      {/* Bubble */}
-      <div
-        className={cn(
-          'max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
-          isUser
-            ? 'bg-primary-600 text-white rounded-br-md'
-            : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md'
-        )}
-      >
-        {isUser ? (
-          <p className="whitespace-pre-wrap">{content}</p>
-        ) : (
-          <div className="prose prose-sm max-w-none prose-table:text-sm prose-th:bg-gray-50 prose-th:px-3 prose-th:py-1.5 prose-td:px-3 prose-td:py-1.5 prose-td:border prose-th:border">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-          </div>
-        )}
+      {/* Content — no background, like Claude */}
+      <div className="flex-1 min-w-0 max-w-[85%]">
+        <div className="prose prose-sm max-w-none leading-[1.7] text-civil-text dark:text-civil-text-dark dark:prose-invert prose-headings:text-civil-text dark:prose-headings:text-civil-text-dark prose-strong:font-semibold">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );
