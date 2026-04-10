@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
+    "migrate": "node scripts/migrate.js",
     "db:migrate": "node src/db/migrate.js",
     "test:agent": "node src/test-agent.js"
   },
@@ -17,7 +19,6 @@
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
     "pg": "^8.13.1",
-    "uuid": "^11.0.3",
-    "@construction/shared": "workspace:*"
+    "uuid": "^11.0.3"
   }
 }

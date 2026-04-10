@@ -2,7 +2,10 @@ import cron from 'node-cron';
 import { v4 as uuidv4 } from 'uuid';
 import pool from '../db/pool.js';
 import { runAgent } from '../agent/index.js';
-import { REPORT_LOCATIONS, REPORT_CRON_SCHEDULE, REPORT_TIMEZONE } from '@construction/shared';
+// Inline shared constants for Railway deploy compatibility (no workspace links)
+const REPORT_LOCATIONS = ['Ho Chi Minh City', 'Bien Hoa', 'Thu Dau Mot'];
+const REPORT_CRON_SCHEDULE = '0 7 * * *';
+const REPORT_TIMEZONE = 'Asia/Ho_Chi_Minh';
 
 /**
  * Generate daily weather reports for all locations.

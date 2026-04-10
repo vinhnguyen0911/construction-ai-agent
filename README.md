@@ -131,28 +131,51 @@ export async function execute({ material }) {
 }
 ```
 
-## Deploy
+## Production Deploy
 
-### Frontend → Vercel
+### Step 1: Database (Neon)
 
-1. Import repo on Vercel
-2. Root Directory: `apps/web`
-3. Build Command: `pnpm build`
-4. Output Directory: `dist`
-5. Environment: add `VITE_API_URL` = Railway backend URL
+1. Create a project at [console.neon.tech](https://console.neon.tech), select **Singapore** region
+2. Copy the connection string (starts with `postgresql://...`)
+3. Run migration:
+   ```bash
+   DATABASE_URL="your-connection-string" node apps/api/scripts/migrate.js
+   ```
 
-### Backend → Railway
+### Step 2: Backend (Railway)
 
-1. Import repo on Railway
-2. Root Directory: `apps/api`
-3. Start Command: `node src/index.js`
-4. Environment: add all variables from `.env.example`
+1. Create a new project at [railway.app](https://railway.app) from your GitHub repo
+2. Set **Root Directory**: `apps/api`
+3. Add environment variables:
+   | Variable | Value |
+   |---|---|
+   | `DATABASE_URL` | Neon connection string |
+   | `GEMINI_API_KEY` | Google AI Studio key |
+   | `OPENWEATHER_API_KEY` | OpenWeatherMap key |
+   | `JWT_SECRET` | Random string (e.g. `openssl rand -hex 32`) |
+   | `ADMIN_USERNAME` | `admin` |
+   | `ADMIN_PASSWORD` | `admin` |
+   | `FRONTEND_URL` | *(set after Vercel deploy)* |
+4. Railway auto-deploys on every push. Start command: `node src/index.js`
 
-### Database → Neon
+### Step 3: Frontend (Vercel)
 
-1. Create project on Neon Dashboard
-2. Copy connection string to `DATABASE_URL`
-3. Run migration: `pnpm db:migrate`
+1. Import repo at [vercel.com](https://vercel.com)
+2. Set **Root Directory**: `apps/web`, **Framework**: Vite
+3. Add environment variable:
+   | Variable | Value |
+   |---|---|
+   | `VITE_API_URL` | Railway backend URL (e.g. `https://your-app.up.railway.app`) |
+4. Vercel auto-deploys on every push
+
+### Step 4: Post-deploy
+
+1. Go back to Railway → add `FRONTEND_URL` = your Vercel URL (e.g. `https://your-app.vercel.app`)
+2. Test: login → chat → check reports
+3. Run migration if not done:
+   ```bash
+   DATABASE_URL="..." node apps/api/scripts/migrate.js
+   ```
 
 ### Railway Free Tier Note
 
