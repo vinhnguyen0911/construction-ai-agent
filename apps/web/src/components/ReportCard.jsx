@@ -5,7 +5,7 @@ import { MapPin, Thermometer, Droplets, Wind } from 'lucide-react';
  * Looks for temperature, humidity, wind, and a short description.
  */
 function extractSummary(content) {
-  const tempMatch = content.match(/(\d{1,2}(?:\.\d)?)\s*°C/);
+  const tempMatch = content.match(/(\d{1,3}(?:\.\d+)?)\s*°C/);
   const humidityMatch = content.match(/(?:humidity|độ ẩm)[:\s]*(\d{1,3})%/i) || content.match(/(\d{1,3})%/);
   const windMatch = content.match(/(\d{1,2}(?:\.\d{1,2})?)\s*(?:km\/h|m\/s)/i);
 
@@ -23,7 +23,7 @@ function extractSummary(content) {
   }
 
   return {
-    temperature: tempMatch ? tempMatch[1] : null,
+    temperature: tempMatch ? Math.round(parseFloat(tempMatch[1])).toString() : null,
     humidity: humidityMatch ? humidityMatch[1] : null,
     wind: windMatch ? windMatch[0] : null,
     summary,
