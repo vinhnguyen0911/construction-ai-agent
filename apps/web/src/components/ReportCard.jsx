@@ -1,4 +1,4 @@
-import { MapPin, Thermometer, Droplets, Wind } from 'lucide-react';
+import { MapPin, Thermometer, Droplets, Wind, Trash2 } from 'lucide-react';
 
 /**
  * Extract a quick summary from the markdown report content.
@@ -30,7 +30,7 @@ function extractSummary(content) {
   };
 }
 
-export default function ReportCard({ report, onClick }) {
+export default function ReportCard({ report, onClick, onDelete }) {
   const { temperature, humidity, wind, summary } = extractSummary(report.content);
 
   return (
@@ -49,9 +49,22 @@ export default function ReportCard({ report, onClick }) {
             {new Date(report.report_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
-        {temperature && (
-          <span className="text-2xl font-bold text-accent dark:text-accent-dark">{temperature}°C</span>
-        )}
+        <div className="flex items-center gap-2">
+          {temperature && (
+            <span className="text-2xl font-bold text-accent dark:text-accent-dark">{temperature}°C</span>
+          )}
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(report);
+              }}
+              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-civil-muted dark:text-civil-muted-dark hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Summary */}

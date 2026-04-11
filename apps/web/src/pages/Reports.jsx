@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 import ReportCard from '../components/ReportCard';
 import ReportDetail from '../components/ReportDetail';
-import { getReports, runReports } from '../lib/api';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { getReports, runReports, deleteReport } from '../lib/api';
 
 /**
  * Group reports by date, newest first.
@@ -33,6 +34,7 @@ export default function Reports() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [reportToDelete, setReportToDelete] = useState(null);
 
   const loadReports = async () => {
     setLoading(true);
@@ -59,6 +61,18 @@ export default function Reports() {
       console.error('Failed to generate reports:', err);
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!reportToDelete) return;
+    try {
+      await deleteReport(reportToDelete.id);
+      setReports((prev) => prev.filter((r) => r.id !== reportToDelete.id));
+      setReportToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete report:', err);
+      alert('Failed to delete report. Please try again.');
     }
   };
 
@@ -120,6 +134,7 @@ export default function Reports() {
                       key={report.id}
                       report={report}
                       onClick={() => setSelectedReport(report)}
+                      onDelete={setReportToDelete}
                     />
                   ))}
                 </div>
@@ -133,6 +148,20 @@ export default function Reports() {
       {selectedReport && (
         <ReportDetail report={selectedReport} onClose={() => setSelectedReport(null)} />
       )}
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={!!reportToDelete}
+        title="Delete report?"
+        message={
+          reportToDelete
+            ? `Are you sure you want to delete the report "${reportToDelete.location} — ${new Date(reportToDelete.report_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}"? This action cannot be undone.`
+            : ''
+        }
+        confirmText="Delete report"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setReportToDelete(null)}
+      />
     </div>
   );
 }

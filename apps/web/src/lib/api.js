@@ -134,6 +134,14 @@ export async function getReports(params = {}) {
 }
 
 /**
+ * DELETE /api/reports/:id
+ */
+export async function deleteReport(id) {
+  const res = await apiFetch(`/api/reports/${id}`, { method: 'DELETE' });
+  return res.json();
+}
+
+/**
  * POST /api/reports/run
  */
 export async function runReports(locations) {

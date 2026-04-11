@@ -43,6 +43,7 @@ export default {
       animation: {
         'fade-in': 'fadeIn 200ms ease-out',
         'slide-up': 'slideUp 200ms ease-out',
+        'scale-in': 'scaleIn 150ms ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -52,6 +53,10 @@ export default {
         slideUp: {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
         },
       },
     },

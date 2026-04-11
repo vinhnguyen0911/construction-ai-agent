@@ -53,7 +53,7 @@ export default function ChatSidebar({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete(conv.id);
+                  onDelete(conv);
                 }}
                 className="hidden group-hover:block p-1 text-civil-muted dark:text-civil-muted-dark hover:text-civil-danger rounded flex-shrink-0"
               >

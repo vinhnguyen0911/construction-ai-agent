@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import ChatSidebar from '../components/ChatSidebar';
 import ChatWindow from '../components/ChatWindow';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { getConversations, getMessages, deleteConversation } from '../lib/api';
 
 export default function Chat() {
   const [conversations, setConversations] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [conversationToDelete, setConversationToDelete] = useState(null);
 
   // Load conversations
   const loadConversations = useCallback(async () => {
@@ -43,16 +45,24 @@ export default function Chat() {
     setMessages([]);
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteRequest = (conv) => {
+    setConversationToDelete(conv);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!conversationToDelete) return;
+    const { id } = conversationToDelete;
     try {
       await deleteConversation(id);
       if (activeId === id) {
         setActiveId(null);
         setMessages([]);
       }
-      loadConversations();
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      setConversationToDelete(null);
     } catch (err) {
       console.error('Failed to delete conversation:', err);
+      alert('Failed to delete conversation. Please try again.');
     }
   };
 
@@ -72,7 +82,7 @@ export default function Chat() {
         activeId={activeId}
         onSelect={setActiveId}
         onNew={handleNewChat}
-        onDelete={handleDelete}
+        onDelete={handleDeleteRequest}
       />
       <div className="flex-1">
         <ChatWindow
@@ -82,6 +92,19 @@ export default function Chat() {
           onMessageSent={handleMessageSent}
         />
       </div>
+
+      <ConfirmDialog
+        open={!!conversationToDelete}
+        title="Delete conversation?"
+        message={
+          conversationToDelete
+            ? `Are you sure you want to delete "${conversationToDelete.title || 'this conversation'}"? All messages will be permanently removed.`
+            : ''
+        }
+        confirmText="Delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConversationToDelete(null)}
+      />
     </div>
   );
 }

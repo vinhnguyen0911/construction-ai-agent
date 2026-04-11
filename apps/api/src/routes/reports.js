@@ -56,4 +56,24 @@ router.post('/run', async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/reports/:id
+ * Delete a single report by id.
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'DELETE FROM daily_reports WHERE id = $1 RETURNING id',
+      [req.params.id]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    res.json({ success: true, id: rows[0].id });
+  } catch (err) {
+    console.error('Error deleting report:', err.message);
+    res.status(500).json({ error: 'Failed to delete report' });
+  }
+});
+
 export default router;
